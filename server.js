@@ -30,8 +30,9 @@ app.post("/api/generate", async (req, res) => {
   }
 
   try {
-    // Build the API URL — handle trailing slash
-    const url = baseUrl.replace(/\/+$/, "") + "/v1/images/generations";
+    // Build the API URL — strip trailing slash and /v1 if already present
+    const cleanBase = baseUrl.replace(/\/+$/, "").replace(/\/v1$/, "");
+    const url = cleanBase + "/v1/images/generations";
 
     const response = await fetch(url, {
       method: "POST",
