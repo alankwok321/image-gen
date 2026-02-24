@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Image Generator</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <h1>🎨 AI Image Generator</h1>
+      <p class="subtitle">Describe anything and bring it to life</p>
+    </header>
+
+    <!-- Controls -->
+    <section class="controls">
+      <textarea
+        id="prompt"
+        placeholder="Describe the image you want to generate..."
+        rows="3"
+      ></textarea>
+
+      <div class="options-row">
+        <div class="option-group">
+          <label for="size">Size</label>
+          <select id="size">
+            <option value="1024x1024" selected>1024 × 1024</option>
+            <option value="512x512">512 × 512</option>
+            <option value="256x256">256 × 256</option>
+          </select>
+        </div>
+
+        <div class="option-group">
+          <label for="model">Model</label>
+          <select id="model">
+            <option value="nano-banana-pro" selected>nano-banana-pro</option>
+            <option value="nano-banana2">nano-banana2</option>
+          </select>
+        </div>
+
+        <button id="generate-btn" class="btn-primary">
+          <span class="btn-text">Generate</span>
+          <span class="btn-loading" hidden>
+            <span class="spinner"></span> Generating…
+          </span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Result -->
+    <section id="result" class="result" hidden>
+      <div class="result-card">
+        <img id="result-image" alt="Generated image" />
+        <div class="result-actions">
+          <p id="result-prompt" class="result-prompt"></p>
+          <a id="download-btn" class="btn-secondary" download="generated-image.png">
+            ⬇ Download
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Error -->
+    <div id="error" class="error" hidden></div>
+
+    <!-- History -->
+    <section id="history-section" class="history-section" hidden>
+      <h2>History</h2>
+      <div id="history" class="history-grid"></div>
+    </section>
+  </div>
+
+  <script src="/js/app.js"></script>
+</body>
+</html>
