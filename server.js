@@ -30,12 +30,11 @@ app.post("/api/generate", async (req, res) => {
   }
 
   try {
-    // Build the API URL — baseUrl may or may not include /v1
+    // Build the API URL
+    // baseUrl already includes /v1 (e.g. https://newapi.pockgo.com/v1)
+    // So we just append /images/generations
     const cleanBase = baseUrl.replace(/\/+$/, "");
-    // If base already ends with /v1, append only /images/generations
-    const url = cleanBase.endsWith("/v1")
-      ? cleanBase + "/images/generations"
-      : cleanBase + "/v1/images/generations";
+    const url = cleanBase + "/images/generations";
 
     const response = await fetch(url, {
       method: "POST",
