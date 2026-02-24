@@ -8,7 +8,7 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
-// API endpoint: generate image via OpenAI-compatible API
+// API endpoint: generate image via chat completions (Gemini image model)
 app.post("/api/generate", async (req, res) => {
   const baseUrl = process.env.OPENAI_BASE_URL;
   const apiKey = process.env.OPENAI_API_KEY;
@@ -21,7 +21,7 @@ app.post("/api/generate", async (req, res) => {
     });
   }
 
-  const { prompt, size, model } = req.body;
+  const { prompt, model } = req.body;
 
   if (!prompt || !prompt.trim()) {
     return res.status(400).json({
@@ -30,11 +30,8 @@ app.post("/api/generate", async (req, res) => {
   }
 
   try {
-    // Build the API URL
-    // baseUrl already includes /v1 (e.g. https://newapi.pockgo.com/v1)
-    // So we just append /images/generations
     const cleanBase = baseUrl.replace(/\/+$/, "");
-    const url = cleanBase + "/images/generations";
+    const url = cleanBase + "/chat/completions";
 
     const response = await fetch(url, {
       method: "POST",
@@ -43,10 +40,14 @@ app.post("/api/generate", async (req, res) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: model || "nano-banana-pro",
-        prompt: prompt.trim(),
-        n: 1,
-        size: size || "1024x1024",
+        model: model || "gemini-3-pro-image-preview",
+        messages: [
+          {
+            role: "user",
+            content: "Generate an image: " + prompt.trim(),
+          },
+        ],
+        max_tokens: 4096,
       }),
     });
 
@@ -56,7 +57,28 @@ app.post("/api/generate", async (req, res) => {
       return res.status(response.status).json(data);
     }
 
-    res.json(data);
+    // Extract image URL from markdown in response
+    const content = data.choices?.[0]?.message?.content || "";
+    const imageMatch = content.match(/!\[.*?\]\((https?:\/\/[^\s)]+)\)/);
+
+    if (imageMatch) {
+      // Return in OpenAI images format for frontend compatibility
+      res.json({
+        created: data.created,
+        data: [{ url: imageMatch[1] }],
+        model: data.model,
+        raw_content: content,
+      });
+    } else {
+      // No image found, return the text content
+      res.json({
+        created: data.created,
+        data: [],
+        model: data.model,
+        raw_content: content,
+        error: { message: "No image was generated. Model response: " + content.substring(0, 200) },
+      });
+    }
   } catch (err) {
     console.error("Image generation error:", err);
     res.status(500).json({
