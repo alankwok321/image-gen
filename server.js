@@ -30,9 +30,12 @@ app.post("/api/generate", async (req, res) => {
   }
 
   try {
-    // Build the API URL — strip trailing slash and /v1 if already present
-    const cleanBase = baseUrl.replace(/\/+$/, "").replace(/\/v1$/, "");
-    const url = cleanBase + "/v1/images/generations";
+    // Build the API URL — baseUrl may or may not include /v1
+    const cleanBase = baseUrl.replace(/\/+$/, "");
+    // If base already ends with /v1, append only /images/generations
+    const url = cleanBase.endsWith("/v1")
+      ? cleanBase + "/images/generations"
+      : cleanBase + "/v1/images/generations";
 
     const response = await fetch(url, {
       method: "POST",
