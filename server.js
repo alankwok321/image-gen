@@ -53,7 +53,7 @@ async function generateSingleImage(prompt, model) {
   }
 
   const content = data.choices?.[0]?.message?.content || "";
-  const imageMatch = content.match(/!\[.*?\]\((https?:\/\/[^\s)]+)\)/);
+  const imageMatch = content.match(/!\[.*?\]\(((?:https?:\/\/|data:image\/)[^\s)]+)\)/);
 
   if (imageMatch) {
     return { url: imageMatch[1] };
@@ -113,7 +113,7 @@ app.post("/api/generate", async (req, res) => {
 
     // Extract image URL from markdown in response
     const content = data.choices?.[0]?.message?.content || "";
-    const imageMatch = content.match(/!\[.*?\]\((https?:\/\/[^\s)]+)\)/);
+    const imageMatch = content.match(/!\[.*?\]\(((?:https?:\/\/|data:image\/)[^\s)]+)\)/);
 
     if (imageMatch) {
       res.json({
